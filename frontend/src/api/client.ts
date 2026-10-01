@@ -7,7 +7,7 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
     },
   });
   if (!res.ok) {
-    throw new Error(`${res.status} ${res.statusText}`);
+    throw new Error(await extractErrorMessage(res));
   }
   return res.json() as Promise<T>;
 }

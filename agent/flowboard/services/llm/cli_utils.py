@@ -77,6 +77,15 @@ def resolve_cli_binary(
         logger.debug(f"{cli_name}: resolved from PATH: {cli_path}")
         return cli_path
 
+    # Try Windows local appdata locations (e.g. %LOCALAPPDATA%\agy\bin\agy.exe)
+    local_appdata = os.environ.get("LOCALAPPDATA") or os.path.expanduser(r"~\AppData\Local")
+    if local_appdata:
+        for ext in (".exe", ".cmd", ""):
+            candidate = os.path.join(local_appdata, cli_name, "bin", f"{cli_name}{ext}")
+            if os.path.isfile(candidate):
+                logger.debug(f"{cli_name}: resolved from local appdata: {candidate}")
+                return candidate
+
     # Try Windows npm locations
     for npm_path in get_windows_npm_paths(cli_name):
         if os.path.exists(npm_path):
